@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from db import get_connection
 from flask import Flask, request, jsonify, send_from_directory
 from flask import request, jsonify
+from flask_cors import CORS
+CORS(app)
 
 app = Flask(__name__)
 @app.route("/")
@@ -151,4 +153,5 @@ def updateNote():
 
 
 if __name__ == "__main__":
+
     app.run(debug=True)
