@@ -11,6 +11,10 @@ CORS(app)
 def home():
     return send_from_directory(".", "login.html")
 
+
+@app.route("/ping")
+def ping():
+    return "Server alive"
 # ---------- REGISTER ----------
 @app.route("/register", methods=["POST"])
 def register():
@@ -156,4 +160,5 @@ def updateNote():
 if __name__ == "__main__":
 
     app.run(debug=True)
+
 
