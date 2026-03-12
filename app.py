@@ -76,6 +76,21 @@ def send_otp():
 
     return "OTP_SENT"
 
+@app.route("/test-mail")
+def test_mail():
+
+    msg = Message(
+        "Test Email",
+        sender=app.config['MAIL_USERNAME'],
+        recipients=[app.config['MAIL_USERNAME']]
+    )
+
+    msg.body = "Mail system working!"
+
+    mail.send(msg)
+
+    return "Mail sent"
+
 @app.route("/login", methods=["POST"])
 def login():
 
@@ -200,6 +215,7 @@ if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
