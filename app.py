@@ -13,7 +13,15 @@ CORS(app)
 def home():
     return send_from_directory(".", "login.html")
 
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USER")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASS")
 
+mail = Mail(app)
+
+otp_store = {}
 @app.route("/ping")
 def ping():
     return "Server alive"
@@ -37,7 +45,26 @@ def register():
 
 
 # ---------- LOGIN ----------
+@app.route("/sendOTP", methods=["POST"])
+def send_otp():
 
+    email = request.form.get("email")
+
+    otp = random.randint(100000,999999)
+
+    otp_store[email] = otp
+
+    msg = Message(
+        "StudyX Vault Email Verification",
+        sender=app.config['MAIL_USERNAME'],
+        recipients=[email]
+    )
+
+    msg.body = f"Your verification OTP is {otp}"
+
+    mail.send(msg)
+
+    return "OTP_SENT"
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -163,6 +190,7 @@ if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
