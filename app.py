@@ -16,8 +16,8 @@ from flask_mail import Mail, Message
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = "studyxvault@gmail.com"
-app.config['MAIL_PASSWORD'] = "your_gmail_app_password"
+app.config['MAIL_USERNAME'] = "studyportal28@gmail.com"
+app.config['MAIL_PASSWORD'] = "Study@123"
 
 mail = Mail(app)
 # ---------- REGISTER ----------
@@ -178,4 +178,5 @@ def updateNote():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
