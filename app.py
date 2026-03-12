@@ -11,7 +11,15 @@ CORS(app)
 def home():
     return send_from_directory(".", "login.html")
 
+from flask_mail import Mail, Message
 
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = "studyxvault@gmail.com"
+app.config['MAIL_PASSWORD'] = "your_gmail_app_password"
+
+mail = Mail(app)
 # ---------- REGISTER ----------
 @app.route("/register", methods=["POST"])
 def register():
@@ -170,3 +178,4 @@ def updateNote():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
