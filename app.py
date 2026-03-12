@@ -21,32 +21,20 @@ app.config['MAIL_PASSWORD'] = "Study@123"
 
 mail = Mail(app)
 # ---------- REGISTER ----------
-@app.route("/verifyOTP", methods=["POST"])
-def verify_otp():
+@app.route("/testmail")
+def testmail():
 
-    username = request.form.get("username")
-    email = request.form.get("email")
-    password = request.form.get("password")
-    otp = request.form.get("otp")
+    msg = Message(
+        "Test Mail",
+        sender=app.config['MAIL_USERNAME'],
+        recipients=["suryawanshisai092@gmail.com"]
+    )
 
-    if email in otp_store and str(otp_store[email]) == otp:
+    msg.body = "Testing mail system"
 
-        con = get_connection()
-        cur = con.cursor()
+    mail.send(msg)
 
-        sql = "INSERT INTO users(username,email,password,role) VALUES(%s,%s,%s,'STUDENT')"
-
-        cur.execute(sql,(username,email,password))
-        con.commit()
-
-        cur.close()
-        con.close()
-
-        return "SUCCESS"
-
-    else:
-        return "INVALID_OTP"
-
+    return "MAIL SENT"
 
 import random
 
@@ -210,6 +198,7 @@ def updateNote():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
