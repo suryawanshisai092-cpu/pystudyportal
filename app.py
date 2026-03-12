@@ -56,10 +56,25 @@ otp_store = {}
 def send_otp():
 
     email = request.form.get("email")
+    print("EMAIL RECEIVED:", email)
 
-    print("EMAIL:", email)
+    otp = random.randint(100000,999999)
+    print("OTP:", otp)
 
-    return "OTP_SENT"# ---------- LOGIN ----------
+    otp_store[email] = otp
+
+    msg = Message(
+        "StudyX Vault OTP",
+        sender=app.config['MAIL_USERNAME'],
+        recipients=[email]
+    )
+
+    msg.body = f"Your OTP is {otp}"
+
+    mail.send(msg)
+
+    return "OTP_SENT"
+# ---------- LOGIN ----------
 @app.route("/login", methods=["POST"])
 def login():
 
@@ -195,6 +210,7 @@ def updateNote():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
