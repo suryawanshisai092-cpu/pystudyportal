@@ -21,26 +21,57 @@ app.config['MAIL_PASSWORD'] = "Study@123"
 
 mail = Mail(app)
 # ---------- REGISTER ----------
-@app.route("/register", methods=["POST"])
-def register():
+@app.route("/verifyOTP", methods=["POST"])
+def verify_otp():
 
     username = request.form.get("username")
     email = request.form.get("email")
     password = request.form.get("password")
+    otp = request.form.get("otp")
 
-    con = get_connection()
-    cur = con.cursor()
+    if email in otp_store and str(otp_store[email]) == otp:
 
-    sql = "INSERT INTO users(username,email,password,role) VALUES(%s,%s,%s,'STUDENT')"
+        con = get_connection()
+        cur = con.cursor()
 
-    cur.execute(sql,(username,email,password))
-    con.commit()
+        sql = "INSERT INTO users(username,email,password,role) VALUES(%s,%s,%s,'STUDENT')"
 
-    cur.close()
-    con.close()
+        cur.execute(sql,(username,email,password))
+        con.commit()
 
-    return "SUCCESS"
+        cur.close()
+        con.close()
 
+        return "SUCCESS"
+
+    else:
+        return "INVALID_OTP"
+
+
+import random
+
+otp_store = {}
+
+@app.route("/sendOTP", methods=["POST"])
+def send_otp():
+
+    email = request.form.get("email")
+
+    otp = random.randint(100000,999999)
+
+    otp_store[email] = otp
+
+    msg = Message(
+        "StudyX Email Verification",
+        sender=app.config['MAIL_USERNAME'],
+        recipients=[email]
+    )
+
+    msg.body = f"Your OTP is {otp}"
+
+    mail.send(msg)
+
+    return "OTP_SENT"
 
 # ---------- LOGIN ----------
 @app.route("/login", methods=["POST"])
@@ -178,5 +209,6 @@ def updateNote():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
