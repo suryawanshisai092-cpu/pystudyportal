@@ -1,96 +1,40 @@
-from flask import Flask, request, jsonify
-from db import get_connection
 from flask import Flask, request, jsonify, send_from_directory
-from flask import request, jsonify
 from flask_cors import CORS
-from flask_mail import Mail, Message
-import random
+from db import get_connection
 import os
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://studyxvault.vercel.app"}})
+
+CORS(app)
+
 @app.route("/")
 def home():
     return send_from_directory(".", "login.html")
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.getenv("MAIL_USER")
-app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASS")
 
-mail = Mail(app)
-
-otp_store = {}
-@app.route("/ping")
-def ping():
-    return "Server alive"
 # ---------- REGISTER ----------
-@app.route("/verifyOTP", methods=["POST"])
-def verify_otp():
+@app.route("/register", methods=["POST"])
+def register():
 
     username = request.form.get("username")
     email = request.form.get("email")
     password = request.form.get("password")
-    otp = request.form.get("otp")
 
-    if email in otp_store and str(otp_store[email]) == otp:
+    con = get_connection()
+    cur = con.cursor()
 
-        con = get_connection()
-        cur = con.cursor()
+    sql = "INSERT INTO users(username,email,password,role) VALUES(%s,%s,%s,'STUDENT')"
 
-        sql = "INSERT INTO users(username,email,password,role) VALUES(%s,%s,%s,'STUDENT')"
+    cur.execute(sql,(username,email,password))
+    con.commit()
 
-        cur.execute(sql,(username,email,password))
-        con.commit()
+    cur.close()
+    con.close()
 
-        cur.close()
-        con.close()
+    return "SUCCESS"
 
-        del otp_store[email]
-
-        return "VERIFIED"
-
-    else:
-        return "INVALID_OTP"
 
 # ---------- LOGIN ----------
-@app.route("/sendOTP", methods=["POST"])
-def send_otp():
-
-    email = request.form.get("email")
-
-    otp = random.randint(100000,999999)
-
-    otp_store[email] = otp
-
-    msg = Message(
-        "StudyX Vault Email Verification",
-        sender=app.config['MAIL_USERNAME'],
-        recipients=[email]
-    )
-
-    msg.body = f"Your verification OTP is {otp}"
-
-    mail.send(msg)
-
-    return "OTP_SENT"
-
-@app.route("/test-mail")
-def test_mail():
-
-    msg = Message(
-        "Test Email",
-        sender=app.config['MAIL_USERNAME'],
-        recipients=[app.config['MAIL_USERNAME']]
-    )
-
-    msg.body = "Mail system working!"
-
-    mail.send(msg)
-
-    return "Mail sent successfully"
-
 @app.route("/login", methods=["POST"])
 def login():
 
@@ -111,9 +55,11 @@ def login():
     con.close()
 
     if result:
-        return result[0]   # ADMIN or STUDENT
+        return result[0]
     else:
         return "INVALID"
+
+
 # ---------- GET NOTES ----------
 @app.route("/getNotes")
 def getNotes():
@@ -152,6 +98,7 @@ def getNotes():
 
     return jsonify(notes)
 
+
 # ---------- UPLOAD NOTE ----------
 @app.route("/uploadNote", methods=["POST"])
 def uploadNote():
@@ -170,6 +117,9 @@ def uploadNote():
     cur.execute(sql,(title,desc,url,category,year))
     con.commit()
 
+    cur.close()
+    con.close()
+
     return "SUCCESS"
 
 
@@ -184,6 +134,9 @@ def deleteNote():
 
     cur.execute("DELETE FROM notes WHERE id=%s",(id,))
     con.commit()
+
+    cur.close()
+    con.close()
 
     return "SUCCESS"
 
@@ -208,19 +161,12 @@ def updateNote():
     cur.execute(sql,(title,desc,category,year,id))
     con.commit()
 
+    cur.close()
+    con.close()
+
     return "SUCCESS"
 
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-
-
-
-
-
-
-
-
