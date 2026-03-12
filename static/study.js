@@ -1,7 +1,6 @@
 let currentStudentSection = "notes";
 let isLogin = true;
 let editId = null;
-
 let allNotes = [];
 
 // 🔗 Render Backend URL
@@ -286,20 +285,4 @@ function escapeHtml(str){
 }
 
 
-function sendOTP(){
 
-  const email = regEmail.value.trim();
-
-  fetch(API + "/sendOTP",{
-    method:"POST",
-    headers:{"Content-Type":"application/x-www-form-urlencoded"},
-    body:`email=${encodeURIComponent(email)}`
-  })
-  .then(res=>res.text())
-  .then(data=>{
-      if(data==="OTP_SENT"){
-          alert("OTP sent to email");
-      }
-  });
-
-}
