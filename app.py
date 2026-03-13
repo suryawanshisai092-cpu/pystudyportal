@@ -11,60 +11,29 @@ CORS(app)
 def home():
     return send_from_directory(".", "login.html")
 
-from flask_mail import Mail, Message
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = "studyportal28@gmail.com"
-app.config['MAIL_PASSWORD'] = "Study@123"
-
-mail = Mail(app)
 # ---------- REGISTER ----------
-@app.route("/testmail")
-def testmail():
+@app.route("/register", methods=["POST"])
+def register():
 
-    msg = Message(
-        "Test Mail",
-        sender=app.config['MAIL_USERNAME'],
-        recipients=["suryawanshisai092@gmail.com"]
-    )
+    username = request.form.get("username")
+    email = request.form.get("email")
+    password = request.form.get("password")
 
-    msg.body = "Testing mail system"
+    con = get_connection()
+    cur = con.cursor()
 
-    mail.send(msg)
+    sql = "INSERT INTO users(username,email,password,role) VALUES(%s,%s,%s,'STUDENT')"
 
-    return "MAIL SENT"
+    cur.execute(sql,(username,email,password))
+    con.commit()
 
-import random
+    cur.close()
+    con.close()
 
-otp_store = {}
+    return "SUCCESS"
 
-@app.route("/sendOTP", methods=["POST"])
-def send_otp():
 
-    try:
-        email = request.form.get("email")
-
-        otp = random.randint(100000,999999)
-
-        otp_store[email] = otp
-
-        msg = Message(
-            "StudyX Vault OTP",
-            sender=app.config['MAIL_USERNAME'],
-            recipients=[email]
-        )
-
-        msg.body = f"Your OTP is {otp}"
-
-        mail.send(msg)
-
-        return "OTP_SENT"
-
-    except Exception as e:
-        print("MAIL ERROR:", e)
-        return "ERROR"
 # ---------- LOGIN ----------
 @app.route("/login", methods=["POST"])
 def login():
@@ -201,6 +170,7 @@ def updateNote():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
