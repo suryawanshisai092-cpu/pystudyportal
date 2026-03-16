@@ -96,7 +96,27 @@ def getNotes():
 
     return jsonify(notes)
 
+# ---------- Admin USer list ----------
+@app.route("/getUsers")
+def getUsers():
 
+    con = get_connection()
+    cur = con.cursor()
+
+    cur.execute("SELECT id,username,email FROM users")
+
+    rows = cur.fetchall()
+
+    users=[]
+
+    for r in rows:
+        users.append({
+            "id":r[0],
+            "username":r[1],
+            "email":r[2]
+        })
+
+    return jsonify(users)
 # ---------- UPLOAD NOTE ----------
 @app.route("/uploadNote", methods=["POST"])
 def uploadNote():
