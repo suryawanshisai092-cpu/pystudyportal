@@ -142,15 +142,24 @@ def uploadNote():
 
 
 # ---------- DELETE NOTE ----------
-@app.route("/deleteNote")
-def deleteNote():
+@app.route("/deleteUser")
+def deleteUser():
 
     id = request.args.get("id")
 
     con = get_connection()
     cur = con.cursor()
 
-    cur.execute("DELETE FROM notes WHERE id=%s",(id,))
+    # check username
+    cur.execute("SELECT username FROM users WHERE id=%s",(id,))
+    user = cur.fetchone()
+
+    if user and user[0].lower() == "admin":
+        cur.close()
+        con.close()
+        return "CANNOT_DELETE_ADMIN"
+
+    cur.execute("DELETE FROM users WHERE id=%s",(id,))
     con.commit()
 
     cur.close()
