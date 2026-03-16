@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-CORS(app)
+CORS(app, origins=["https://studyxvault.vercel.app"])
 
 @app.route("/")
 def home():
