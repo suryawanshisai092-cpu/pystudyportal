@@ -55,11 +55,9 @@ def login():
     con.close()
 
     if result:
-        return result[0]
+        return result[0].strip()   # 🔥 important
     else:
         return "INVALID"
-
-
 # ---------- GET NOTES ----------
 @app.route("/getNotes")
 def getNotes():
