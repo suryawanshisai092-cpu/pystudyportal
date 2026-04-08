@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from db import get_connection
 import os
-
 app = Flask(__name__)
 
 CORS(app, origins=["https://studyxvault.vercel.app"])
